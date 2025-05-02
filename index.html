@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Geo-Locked OTP Generator</title>
+  <link rel="stylesheet" href="styles-index.css">
+</head>
+<body>
+  <div class="container">
+    <h1>수월봉 파도 Geo-Locked OTP</h1>
+    <label class="file-label" for="fileInput">PNG 이미지 선택</label>
+    <input type="file" id="fileInput" accept="image/png" class="hidden">
+
+    <img id="preview" class="photo-preview hidden" alt="원본 이미지">
+
+    <canvas id="canvasIn"  class="hidden"></canvas>
+    <canvas id="canvasEdge" class="hidden"></canvas>
+
+    <div id="status">이미지를 업로드해 주세요.</div>
+    <div id="otp"></div>
+    <div id="qr"></div>
+    <button id="viewProcess" class="button hidden">과정 보기</button>
+  </div>
+
+  <!-- OpenCV.js -->
+  <script src="https://docs.opencv.org/4.5.2/opencv.js"></script>
+  <!-- QRCode.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <!-- 메인 로직 -->
+  <script src="script.js"></script>
+</body>
+</html>

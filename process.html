@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OTP 도출 과정 보기</title>
+  <link rel="stylesheet" href="styles-process.css">
+</head>
+<body>
+  <div class="container process">
+    <h1>OTP 도출 과정</h1>
+    <div class="columns">
+      <div class="col">
+        <section class="step">
+          <h2>1. 원본 이미지</h2>
+          <img id="procOriginal" class="photo-preview" alt="원본 이미지">
+        </section>
+        <section class="step">
+          <h2>2. 에지 이미지</h2>
+          <img id="procEdge" class="photo-preview" alt="에지 이미지">
+          <dl>
+            <dt>추출된 비트 수</dt><dd id="procRawBits"></dd>
+            <dt>편향 제거 후 비트 수</dt><dd id="procUnbiasedBits"></dd>
+          </dl>
+        </section>
+      </div>
+      <div class="col">
+        <section class="step">
+          <h2>3. Seed &amp; HMAC</h2>
+          <dl>
+            <dt>Seed (SHA-256)</dt><dd><pre id="procSeed"></pre></dd>
+            <dt>위치 (위도, 경도)</dt><dd id="procLocation"></dd>
+            <dt>Timestamp</dt><dd id="procTimestamp"></dd>
+            <dt>HMAC-SHA256</dt><dd><pre id="procHmac"></pre></dd>
+          </dl>
+        </section>
+        <section class="step">
+          <h2>4. Dynamic Truncation</h2>
+          <dl>
+            <dt>Offset</dt><dd id="procOffset"></dd>
+            <dt>Raw code (31bit)</dt><dd id="procRawCode"></dd>
+          </dl>
+        </section>
+        <section class="step">
+          <h2>5. 최종 OTP</h2>
+          <p id="procOtp" class="final-otp"></p>
+        </section>
+        <a href="index.html" class="button">메인으로 돌아가기</a>
+      </div>
+    </div>
+  </div>
+  <script src="process.js"></script>
+</body>
+</html>
