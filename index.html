@@ -1,33 +1,70 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Geo-Locked OTP Generator</title>
-  <link rel="stylesheet" href="styles-index.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>수월봉 디지털 방문증 생성기</title>
+    <link rel="stylesheet" href="style-index.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 </head>
 <body>
-  <div class="container">
-    <h1>수월봉 파도 Geo-Locked OTP</h1>
-    <label class="file-label" for="fileInput">PNG 이미지 선택</label>
-    <input type="file" id="fileInput" accept="image/png" class="hidden">
+    <canvas id="particle-canvas"></canvas>
 
-    <img id="preview" class="photo-preview hidden" alt="원본 이미지">
+    <main class="container">
+        <header class="hero">
+            <h1>수월봉 디지털 방문증</h1>
+            <p>
+                수월봉에서 마주한 그 순간의 파도를<br>
+                세상에 하나뿐인 디지털 기념품으로 간직하세요.
+            </p>
+        </header>
 
-    <canvas id="canvasIn"  class="hidden"></canvas>
-    <canvas id="canvasEdge" class="hidden"></canvas>
+        <section class="creator-box">
+            <label for="fileInput" class="file-label" id="fileLabel">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                <span>파도 사진 업로드 (PNG/JPG)</span>
+            </label>
+            <input type="file" id="fileInput" accept="image/png, image/jpeg" class="hidden">
+            <img id="preview" class="photo-preview hidden" alt="선택한 이미지">
+            <button id="generateButton" class="button hidden">
+                내 방문증 만들기
+            </button>
+        </section>
 
-    <div id="status">이미지를 업로드해 주세요.</div>
-    <div id="otp"></div>
-    <div id="qr"></div>
-    <button id="viewProcess" class="button hidden">과정 보기</button>
-  </div>
+        <div id="processing-overlay" class="overlay hidden">
+            <div class="processing-modal">
+                <h2>방문증 생성 중...</h2>
+                <ul class="steps">
+                    <li id="step-geo">
+                        <div class="spinner"></div>
+                        <span>위치 정보 확인 중...</span>
+                    </li>
+                    <li id="step-analyze" class="pending">
+                        <div class="spinner"></div>
+                        <span>사진 분석 및 에지 검출...</span>
+                    </li>
+                    <li id="step-entropy" class="pending">
+                        <div class="spinner"></div>
+                        <span>고유 엔트로피 추출...</span>
+                    </li>
+                    <li id="step-hash" class="pending">
+                        <div class="spinner"></div>
+                        <span>Geo-Hash 시드 생성...</span>
+                    </li>
+                    <li id="step-complete" class="pending">
+                        <div class="spinner"></div>
+                        <span>디지털 방문증 완성!</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
 
-  <!-- OpenCV.js -->
-  <script src="https://docs.opencv.org/4.5.2/opencv.js"></script>
-  <!-- QRCode.js -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <!-- 메인 로직 -->
-  <script src="script.js"></script>
+        <script src="https://docs.opencv.org/4.5.2/opencv.js"></script>
+        <script src="particles.js"></script>
+        <script src="app.js"></script>
+
+        <canvas id="canvasIn"  class="hidden"></canvas>
+        <canvas id="canvasEdge" class="hidden"></canvas>
+    </main>
 </body>
 </html>
