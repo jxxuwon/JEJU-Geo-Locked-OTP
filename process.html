@@ -1,54 +1,112 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>OTP 도출 과정 보기</title>
-  <link rel="stylesheet" href="styles-process.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>방문증 발급 원리</title>
+    <link rel="stylesheet" href="style-process.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&family=Playfair+Display:wght@700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 </head>
 <body>
-  <div class="container process">
-    <h1>OTP 도출 과정</h1>
-    <div class="columns">
-      <div class="col">
-        <section class="step">
-          <h2>1. 원본 이미지</h2>
-          <img id="procOriginal" class="photo-preview" alt="원본 이미지">
-        </section>
-        <section class="step">
-          <h2>2. 에지 이미지</h2>
-          <img id="procEdge" class="photo-preview" alt="에지 이미지">
-          <dl>
-            <dt>추출된 비트 수</dt><dd id="procRawBits"></dd>
-            <dt>편향 제거 후 비트 수</dt><dd id="procUnbiasedBits"></dd>
-          </dl>
-        </section>
-      </div>
-      <div class="col">
-        <section class="step">
-          <h2>3. Seed &amp; HMAC</h2>
-          <dl>
-            <dt>Seed (SHA-256)</dt><dd><pre id="procSeed"></pre></dd>
-            <dt>위치 (위도, 경도)</dt><dd id="procLocation"></dd>
-            <dt>Timestamp</dt><dd id="procTimestamp"></dd>
-            <dt>HMAC-SHA256</dt><dd><pre id="procHmac"></pre></dd>
-          </dl>
-        </section>
-        <section class="step">
-          <h2>4. Dynamic Truncation</h2>
-          <dl>
-            <dt>Offset</dt><dd id="procOffset"></dd>
-            <dt>Raw code (31bit)</dt><dd id="procRawCode"></dd>
-          </dl>
-        </section>
-        <section class="step">
-          <h2>5. 최종 OTP</h2>
-          <p id="procOtp" class="final-otp"></p>
-        </section>
-        <a href="index.html" class="button">메인으로 돌아가기</a>
-      </div>
-    </div>
-  </div>
-  <script src="process.js"></script>
+    <canvas id="particle-canvas"></canvas>
+
+    <main class="container">
+        <h1>방문증 발급 과정</h1>
+        <p class="subtitle">
+            어떻게 파도 사진이 세상에 하나뿐인 ID가 될까요?
+        </p>
+
+        <div class="process-grid">
+            
+            <section class="step-card">
+                <h2>1. 원본 이미지 입력</h2>
+                <img id="proc-original" alt="원본 사진">
+                <dl>
+                    <dt>입력 데이터</dt>
+                    <dd>사용자가 업로드한 수월봉 파도 사진</dd>
+                </dl>
+            </section>
+
+            <section class="step-card">
+                <h2>2. 파도 윤곽선 검출 (Edge)</h2>
+                <img id="proc-edge" alt="에지 검출 이미지">
+                <dl>
+                    <dt>알고리즘</dt>
+                    <dd>OpenCV.js Canny Edge Detection</dd>
+                    <dt>목표</dt>
+                    <dd>사진의 고유한 '패턴'인 파도 윤곽선만 추출</dd>
+                </dl>
+            </section>
+
+            <section class="step-card data-card">
+                <h2>3. 엔트로피 비트열 추출</h2>
+                <dl>
+                    <dt>방식</dt>
+                    <dd>에지 픽셀의 (x, y) 좌표 최하위 비트(LSB) 수집</dd>
+                    <dt>총 수집 비트</dt>
+                    <dd id="proc-raw-bits">0 bits</dd>
+                    <dt>편향 제거 (Von Neumann)</dt>
+                    <dd>연속된 '01' -> 0, '10' -> 1로 변환 (편향성 제거)</dd>
+                    <dt>최종 엔트로피 비트</dt>
+                    <dd id="proc-unbiased-bits">0 bits</dd>
+                    <dt>추출된 비트열 (일부)</dt>
+                    <dd><pre id="proc-unbiased-bitstream">...loading...</pre></dd>
+                </dl>
+            </section>
+
+            <section class="step-card data-card">
+                <h2>4. 고유 시드 생성 (Seed)</h2>
+                <dl>
+                    <dt>알고리즘</dt>
+                    <dd>SHA-256 (Secure Hash Algorithm)</dd>
+                    <dt>입력</dt>
+                    <dd>단계 3의 최종 엔트로피 비트열</dd>
+                    <dt>결과 (256-bit Seed)</dt>
+                    <dd><pre id="proc-seed">...loading...</pre></dd>
+                </dl>
+            </section>
+
+            <section class="step-card data-card">
+                <h2>5. 위치/시각 잠금 (Geo-Lock)</h2>
+                <dl>
+                    <dt>알고리즘</dt>
+                    <dd>HMAC-SHA256 (Hash-based MAC)</dd>
+                    <dt>Key (비밀키)</dt>
+                    <dd>단계 4의 256-bit Seed</dd>
+                    <dt>Message (메시지)</dt>
+                    <dd id="proc-message">...loading...</dd>
+                    <dt>결과 (HMAC 값)</dt>
+                    <dd><pre id="proc-hmac">...loading...</pre></dd>
+                </dl>
+            </section>
+
+            <section class="step-card data-card">
+                <h2>6. 최종 방문증 ID 도출</h2>
+                <dl>
+                    <dt>알고리즘</dt>
+                    <dd>Dynamic Truncation (RFC 4226)</dd>
+                    <dt>Offset (오프셋)</dt>
+                    <dd>HMAC 마지막 4비트 (<code id="proc-offset">0</code>)</dd>
+                    <dt>추출된 31-bit 정수</dt>
+                    <dd id="proc-codeint">0</dd>
+                    <dt>최종 연산</dt>
+                    <dd><code>(31-bit 정수) % 1,000,000</code></dd>
+                    <dt>최종 6자리 ID</dt>
+                    <dd><strong id="proc-final-id">000000</strong></dd>
+                </dl>
+            </section>
+        </div>
+
+        <div class="button-group">
+            <a href="card.html" class="button">방문증으로 돌아가기</a>
+            <a href="index.html" class="button button-tertiary">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"></polyline><polyline points="23 20 23 14 17 14"></polyline><path d="M20.49 9A9 9 0 0 0 12 5C8.49 5 5.29 6.78 3.53 9.51L1 10m22 4l-2.53 0.49A9 9 0 0 0 12 19c-3.51 0-6.71-1.78-8.47-4.51L1 14"></path></svg>
+                새 방문증 만들기
+            </a>
+        </div>
+    </main>
+
+    <script src="particles.js"></script>
+    <script src="process.js"></script>
 </body>
 </html>
