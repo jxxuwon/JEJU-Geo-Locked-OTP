@@ -1,0 +1,243 @@
+/* style-card.css */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&family=Playfair+Display:wght@700&family=Share+Tech+Mono&display=swap');
+
+:root {
+    /* Cosmic Ocean Palette */
+    --color-bg: #0d1117;
+    --color-primary: #58a6ff;
+    --color-accent: #39d39f;
+    --color-text: #c9d1d9;
+    --color-text-dark: #f0f6fc;
+    --color-border: rgba(139, 148, 158, 0.3);
+
+    --text-mono: 'Share Tech Mono', monospace;
+    --shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    --radius: 20px; /* 카드 반지름 */
+}
+
+/* --- Base & Background --- */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: 'Noto Sans KR', sans-serif;
+    color: var(--color-text);
+    background-color: var(--color-bg);
+    /* padding: 2rem; */ /* [삭제] 기존 패딩 제거 */
+    overflow-x: hidden;
+
+    /* [추가] Flexbox를 이용한 세로/가로 중앙 정렬 */
+    display: flex;
+    align-items: center;     /* 세로 중앙 */
+    justify-content: center; /* 가로 중앙 */
+    min-height: 100vh;       /* body 높이를 뷰포트 전체로 설정 */
+}
+
+#particle-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    opacity: 0.5;
+}
+
+.container {
+    width: 100%;
+    max-width: 900px;
+    /* margin: 0 auto; */ /* [삭제] flex justify-content로 대체됨 */
+    animation: fadeIn 1s ease-out;
+    z-index: 10;
+    
+    /* [추가] body에서 제거된 padding을 container로 이동 */
+    /* 모바일에서 화면 가장자리에 붙지 않도록 여백 확보 */
+    padding: 2rem;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+h1 {
+    font-family: 'Playfair Display', serif;
+    color: var(--color-text-dark);
+    font-size: 2.5rem;
+    text-align: center;
+    margin-bottom: 2.5rem;
+    text-shadow: 0 0 10px rgba(88, 166, 255, 0.3);
+}
+
+/* --- [핵심] Digital Card 3D & Sheen --- */
+.card-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 0; /* 버튼 그룹으로 마진 이동 */
+    perspective: 2000px; 
+}
+
+.card-container {
+    width: 350px;
+    height: 550px;
+    border-radius: var(--radius);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+    overflow: hidden;
+    position: relative;
+    background-size: cover;
+    background-position: center;
+    transition: transform 0.1s ease-out;
+    transform-style: preserve-3d;
+    animation: cardIntro 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes cardIntro {
+    from {
+        opacity: 0;
+        transform: rotateY(30deg) rotateX(10deg) translateY(50px);
+    }
+    to {
+        opacity: 1;
+        transform: rotateY(0) rotateX(0) translateY(0);
+    }
+}
+
+.card-sheen {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    border-radius: inherit;
+    z-index: 5;
+    background: radial-gradient(
+        circle at var(--mouse-x) var(--mouse-y),
+        rgba(255, 255, 255, 0.4) 0%,
+        rgba(255, 255, 255, 0) 40%
+    );
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+.card-container.hover .card-sheen {
+    opacity: 1;
+}
+
+.card-overlay {
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--color-text-dark);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 1.5rem;
+    z-index: 2;
+}
+
+.card-header {
+    text-align: right;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    padding-bottom: 0.5rem;
+}
+.card-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    letter-spacing: 2px;
+}
+.card-header p {
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    opacity: 0.8;
+}
+
+.card-body { display: flex; align-items: center; gap: 1rem; }
+.card-qr {
+    width: 100px;
+    height: 100px;
+    background: white;
+    padding: 5px;
+    border-radius: 8px;
+    flex-shrink: 0;
+}
+.card-qr img { width: 100% !important; height: 100% !important; }
+
+.card-info dt {
+    font-size: 0.7rem;
+    font-weight: 700;
+    opacity: 0.7;
+    margin-top: 0.5rem;
+}
+.card-info dd {
+    font-family: var(--text-mono);
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin-left: 0;
+    word-break: break-all;
+}
+
+.card-footer { font-family: var(--text-mono); }
+.card-footer p { font-size: 0.6rem; opacity: 0.7; }
+.card-footer code { font-size: 0.75rem; word-break: break-all; }
+
+
+/* --- Button Group --- */
+.button-group {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap; /* 버튼이 여러 줄로 나뉘도록 */
+    margin-top: 3rem; /* 카드와의 간격 확보 */
+    z-index: 10;
+    position: relative;
+}
+.button, .button-secondary, .button-tertiary { /* button-tertiary 추가 */
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.8rem 1.5rem;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 1rem;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.button {
+    background: var(--color-accent);
+    color: #0d1117;
+    box-shadow: 0 4px 15px rgba(57, 211, 159, 0.2);
+}
+.button:hover {
+    background: #3ff0b4;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(57, 211, 159, 0.4);
+}
+.button-secondary {
+    background: transparent;
+    border: 2px solid var(--color-border);
+    color: var(--color-text);
+}
+.button-secondary:hover {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: #fff;
+    transform: translateY(-3px);
+}
+
+/* 새 방문증 만들기 버튼 스타일 */
+.button-tertiary {
+    background: transparent;
+    border: 2px solid var(--color-accent);
+    color: var(--color-accent);
+    width: 100%; /* 너비를 꽉 채워서 다른 버튼들과 구분 */
+    max-width: 350px; /* 카드 너비와 비슷하게 */
+    justify-content: center; /* 아이콘/텍스트 중앙 정렬 */
+    margin-top: 0.5rem; /* 윗줄 버튼과 간격 */
+}
+.button-tertiary:hover {
+    background: rgba(57, 211, 159, 0.1); /* 호버 시 은은한 배경 */
+    color: #3ff0b4;
+    border-color: #3ff0b4;
+    transform: translateY(-3px);
+}
